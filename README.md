@@ -8,8 +8,8 @@ reader is the client's facilities contact — not an engineer, not an internal
 employee.
 
 The tool reads a JSONL file where each line is one service report, sends each
-report to Google Gemini for summarization, and produces a single Markdown file
-with all summaries.
+report to Groq (Llama 3.3 70B) for summarization, and produces a single
+Markdown file with all summaries.
 
 Each summary includes:
 
@@ -43,8 +43,8 @@ Each summary includes:
 
 1. Install Python from https://www.python.org/downloads (check "Add to PATH"
    during installation).
-2. Get a free API key from https://aistudio.google.com/apikey.
-3. Create a `.env` file in the project folder with: `GOOGLE_API_KEY=your-key-here`
+2. Get a free API key from https://console.groq.com.
+3. Create a `.env` file in the project folder with: `GROQ_API_KEY=your-groq-key-here`
 4. Double-click `run.bat`.
 5. The tool opens — select your JSONL file and click Generate.
 
@@ -55,13 +55,13 @@ automatically. Steps 2-3 are only needed the first time.
 
 - **Python 3** — standard library for everything except the LLM SDK.
 - **Tkinter** — GUI framework, ships with Python.
-- **Google Gemini** (free tier) — LLM for summarization, via the `google-genai`
-  SDK.
+- **Groq** (free tier) — LLM inference for summarization, running Llama 3.3
+  70B via the `groq` SDK.
 
 ## Prerequisites
 
 - Python 3.12 or later.
-- A Google Gemini API key (free at https://aistudio.google.com/apikey).
+- A Groq API key (free at https://console.groq.com).
 
 ## Setup and installation
 
@@ -89,7 +89,7 @@ automatically. Steps 2-3 are only needed the first time.
    cp .env.example .env
    ```
 
-   Edit `.env` and replace `your-key-here` with your actual Gemini API key.
+   Edit `.env` and replace `your-groq-key-here` with your actual Groq API key.
    The `.env` file is gitignored and will not be committed.
 
 ## How to run
@@ -103,16 +103,11 @@ This launches the GUI. The workflow is:
 1. **Select file** — click Browse and choose a `.jsonl` file containing the
    service reports.
 2. **Generate** — click Generate Summaries. The progress bar advances as each
-   report is processed, showing status like "Processing 3/20..." and
-   "(waiting for API rate limit)" during the delay between requests.
+   report is processed.
 3. **Review results** — the results list shows each report's ID, asset name,
    and status (OK or Review). Click a row to see the reason for any Review
    flag.
 4. **Save** — click Save Markdown to write the output file to disk.
-
-On the Gemini free tier (5 requests per minute), processing 20 reports takes
-approximately 4 minutes due to the rate limit delay between requests. A paid
-API tier removes this delay.
 
 ## Project structure
 
@@ -121,10 +116,10 @@ run.bat              One-click launcher (Windows) — sets up venv and runs the 
 main.py              Entry point — launches the GUI
 gui.py               Tkinter interface (file picker, progress, results, save)
 processor.py         Orchestrates report processing (parse, send, collect)
-llm_client.py        Gemini API integration, prompt construction, retry logic
+llm_client.py        Groq API integration and prompt construction
 report_parser.py     JSONL reader, field validation, contradiction detection
 markdown_writer.py   Assembles the final Markdown output
-requirements.txt     Python dependencies (google-genai)
+requirements.txt     Python dependencies (groq)
 .env.example         API key template
 .gitignore           Excludes .env, __pycache__, venv, output files
 spec.md              Product specification
@@ -148,8 +143,8 @@ sequential commits:
    implementation tasks.
 4. **04-implement** — the tasks were implemented one at a time, each reviewed
    before moving to the next. Deviations discovered during implementation
-   (deprecated SDK, retired model, rate limits) were documented in
-   `decisions.md` rather than silently changing direction.
+   (deprecated SDK, retired model, rate limits, provider switch) were
+   documented in `decisions.md` rather than silently changing direction.
 
 The spec and plan were committed before any code was written. This ensures
 that design decisions are reviewable, the implementation can be validated

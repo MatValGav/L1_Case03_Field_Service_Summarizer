@@ -26,8 +26,8 @@ if not exist "venv\Scripts\python.exe" (
     venv\Scripts\pip install -r requirements.txt
     echo.
 ) else (
-    :: Check if google-genai is installed, reinstall deps if missing
-    venv\Scripts\python -c "from google import genai" >nul 2>&1
+    :: Check if groq is installed, reinstall deps if missing
+    venv\Scripts\python -c "from groq import Groq" >nul 2>&1
     if %errorlevel% neq 0 (
         echo Installing dependencies...
         venv\Scripts\pip install -r requirements.txt
@@ -36,21 +36,21 @@ if not exist "venv\Scripts\python.exe" (
 )
 
 :: 5. Load API key from .env if not already set
-if "%GOOGLE_API_KEY%"=="" (
+if "%GROQ_API_KEY%"=="" (
     if exist ".env" (
         for /f "usebackq tokens=1,* delims==" %%a in (".env") do (
-            if "%%a"=="GOOGLE_API_KEY" set "GOOGLE_API_KEY=%%b"
+            if "%%a"=="GROQ_API_KEY" set "GROQ_API_KEY=%%b"
         )
     )
 )
 
-if "%GOOGLE_API_KEY%"=="" (
-    echo ERROR: GOOGLE_API_KEY is not set.
+if "%GROQ_API_KEY%"=="" (
+    echo ERROR: GROQ_API_KEY is not set.
     echo.
     echo Create a .env file in this folder with the following line:
-    echo   GOOGLE_API_KEY=your-key-here
+    echo   GROQ_API_KEY=your-groq-key-here
     echo.
-    echo Get a free API key at https://aistudio.google.com/apikey
+    echo Get a free API key at https://console.groq.com
     echo.
     pause
     exit /b 1

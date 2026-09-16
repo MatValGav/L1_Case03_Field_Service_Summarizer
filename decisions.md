@@ -67,7 +67,69 @@ added:
 The GUI progress bar shows a "(waiting for API rate limit)" message during
 the delay so the user knows the tool is working.
 
-**Note:** This delay is specific to the Gemini free tier. In a production
-environment with a paid API, the 12-second delay would be removed as paid
-tiers allow thousands of requests per minute. The retry logic would remain
-as a safety net.
+**Note:** This delay was specific to the Gemini free tier. It was removed
+when the project switched to Groq (see below).
+
+### LLM provider: Gemini → Groq (Llama 3.3 70B)
+
+The Gemini free tier's 5 requests/minute rate limit made processing 20
+reports take approximately 8 minutes with mandatory delays between requests.
+The project was switched to Groq's free tier running Llama 3.3 70B
+(`llama-3.3-70b-versatile`). Groq allows 30 requests per minute, so all 20
+reports process in under a minute with only a 2-second safety delay between
+calls. The 12-second fixed delay and retry/backoff logic were removed. Summary
+quality is sufficient for the use case. The Groq SDK (`groq`) uses an
+OpenAI-compatible chat completions interface.
+
+Alternatives considered and rejected:
+- **Portkey + Claude Haiku:** Required Virtual Key access that was not
+  available during implementation (403 Forbidden).
+- **Gemini paid tier:** Would remove rate limits but adds cost for a demo
+  tool.
+
+### Model: llama-3.3-70b-versatile → openai/gpt-oss-120b
+
+The initially selected model `llama-3.3-70b-versatile` was no longer available
+on Groq at the time of implementation. The available free models were queried
+via the Groq API and `openai/gpt-oss-120b` was selected as the largest
+available text generation model (120B parameters), providing the best quality
+for complex instruction-following (PII redaction, contradiction handling,
+prompt injection resistance).
+
+### Prompt injection detection — false positive fix
+
+The initial system prompt caused `openai/gpt-oss-120b` to append the
+`[PROMPT_INJECTION_DETECTED]` marker to every summary (20/20 false positives).
+The model interpreted the injection-detection instruction too broadly. The
+prompt was restructured to:
+
+1. Explicitly list the trigger phrases ("do not mention", "ignore previous
+   rules", "publish directly", "record as", "override", "important
+   instruction").
+2. Emphasize that normal technical notes should NOT trigger the marker.
+3. State that "the vast majority of reports should NOT have this marker."
+
+After the fix, injection detection works correctly: 1/20 flagged (FSR-3009,
+the only report with actual injection language), 0 false positives.
+
+---
+
+## Validation results (20-report batch)
+
+Validation run against `service_reports.jsonl` (20 real service reports):
+
+- **20/20 reports processed** — zero API errors.
+- **PII redaction:** 2 reports contained PII (names, phones, emails,
+  addresses, access codes). All PII silently omitted from output. Zero leaks.
+- **Contradictions:** Duration mismatch (FSR-3005) and parts mismatch
+  (FSR-3006) both flagged correctly with both values shown.
+- **Insufficient data:** 2 reports (FSR-3007, FSR-3008) flagged with
+  incomplete notice and follow-up recommendation.
+- **Prompt injection:** 1 report (FSR-3009) detected and flagged. The
+  injected instruction was ignored; factual content (pressure test) was
+  included in the summary. 0 false positives.
+- **Long report integrity:** FSR-3011 (11.5h, 6+ assets, 7 parts, 2
+  recommendations) — all content present, no truncation.
+- **No internal identifiers:** Zero technician IDs (T-118, T-204, T-311)
+  found in output.
+- **Status indicators:** 20/20 correct (14 OK, 6 Review).

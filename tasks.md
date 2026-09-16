@@ -8,9 +8,9 @@ before moving to the next.
 ## Task 1: Project setup
 
 - Initialize the project directory structure as defined in `plan.md`.
-- Create `requirements.txt` with `google-generativeai`.
+- Create `requirements.txt` with `groq`.
 - Create `.gitignore` excluding `.env`, `__pycache__/`, `*.pyc`, and output files.
-- Create `.env.example` with `GOOGLE_API_KEY=your-key-here`.
+- Create `.env.example` with `GROQ_API_KEY=your-groq-key-here`.
 - Set up a Python virtual environment and install dependencies.
 
 **Done when:** `pip install -r requirements.txt` succeeds, directory structure
@@ -44,9 +44,9 @@ duration mismatches, parts contradictions, or insufficient data.
 
 ---
 
-## Task 3: Gemini LLM client (`llm_client.py`)
+## Task 3: Groq LLM client (`llm_client.py`)
 
-- Read `GOOGLE_API_KEY` from environment variable.
+- Read `GROQ_API_KEY` from environment variable.
 - Raise a clear error at initialization if the key is missing.
 - Build a system prompt encoding the summarization rules from `spec.md`:
   - Role: customer-facing summary writer for a facilities management portal.
@@ -63,10 +63,10 @@ duration mismatches, parts contradictions, or insufficient data.
   - All report fields (except `technician_id`).
   - Calculated duration from timestamps.
   - Any pre-detected flags from the parser (so the LLM can reference them).
-- Send the prompt to Gemini and return the response text.
+- Send the prompt to Groq and return the response text.
 - Handle API errors per report without crashing (return an error status).
 
-**Done when:** A single report can be sent to Gemini and a coherent summary is
+**Done when:** A single report can be sent to Groq and a coherent summary is
 returned. Verify with one clean report and one containing PII.
 
 ---

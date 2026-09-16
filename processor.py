@@ -1,18 +1,16 @@
 import time
 from llm_client import LLMClient
 
-REQUEST_DELAY = 12
+REQUEST_DELAY = 2
 
 
-def process_reports(reports, progress_callback=None, wait_callback=None):
+def process_reports(reports, progress_callback=None):
     client = LLMClient()
     results = []
     total = len(reports)
 
     for i, report in enumerate(reports):
         if i > 0:
-            if wait_callback:
-                wait_callback(i + 1, total)
             time.sleep(REQUEST_DELAY)
 
         result = _process_single(client, report)

@@ -21,17 +21,28 @@ Alternatives rejected:
   (frontend + API server) and exposes the API key problem in the browser. Too much
   complexity for the scope.
 
-### LLM: Google Gemini (free tier)
+### LLM: Groq (Llama 3.3 70B)
 
-The tool uses the Gemini API via the `google-generativeai` Python SDK. Gemini's
-free tier is sufficient for this project's volume. The API key is read from the
-`GOOGLE_API_KEY` environment variable — it is never stored in code or committed to
-the repository.
+The tool uses the Groq API via the `groq` Python SDK, running the
+`llama-3.3-70b-versatile` model. Groq's free tier allows 30 requests per
+minute, sufficient for processing 20 reports in under a minute. The API key
+is read from the `GROQ_API_KEY` environment variable — it is never stored in
+code or committed to the repository.
+
+*Note: The original plan specified Google Gemini (free tier) via the
+`google-generativeai` SDK. During implementation, Gemini's 5 requests/minute
+rate limit made batch processing impractical (8 minutes for 20 reports). Groq
+was selected as a replacement for its higher rate limits and sufficient quality.
+See `decisions.md` for the full deviation history.*
 
 Alternatives rejected:
 
-- **Anthropic Claude** — excellent quality, but no free tier. The cost would be
-  minimal (~$0.10 for 20 reports), but a free option removes friction for reviewers.
+- **Google Gemini (free tier)** — 5 requests/minute rate limit required a
+  12-second delay between calls, making batch processing slow. The SDK was also
+  deprecated during implementation.
+- **Portkey + Claude Haiku** — required Virtual Key access that was not
+  available during implementation.
+- **Anthropic Claude (direct)** — excellent quality, but no free tier.
 - **Ollama (local models)** — fully free and offline, but requires downloading a
   4-8 GB model and varies by hardware. Not practical for a portable demo.
 
@@ -47,8 +58,8 @@ project/
 ├── llm_client.py        # Gemini API integration and prompt construction
 ├── report_parser.py     # JSONL reader and field validation
 ├── markdown_writer.py   # Assembles the final Markdown output
-├── requirements.txt     # google-generativeai
-├── .env.example         # GOOGLE_API_KEY=your-key-here
+├── requirements.txt     # groq
+├── .env.example         # GROQ_API_KEY=your-groq-key-here
 └── .gitignore           # .env, __pycache__, etc.
 ```
 
@@ -67,9 +78,9 @@ one to the LLM client, collects results, and returns structured data (summary te
 - status per report) to the GUI.
 
 **`llm_client.py`** — Builds the prompt from a report's fields and the
-summarization rules, sends it to Gemini, and returns the raw response. This is the
-only module that knows about the LLM provider — swapping to a different provider
-means changing only this file.
+summarization rules, sends it to Groq (Llama 3.3 70B), and returns the raw
+response. This is the only module that knows about the LLM provider — swapping
+to a different provider means changing only this file.
 
 **`report_parser.py`** — Reads the JSONL file line by line, parses each JSON
 object, and performs basic field validation (required fields present, types correct).
@@ -157,5 +168,5 @@ determine the status indicator.
 
 ## Dependencies
 
-- `google-generativeai` — Gemini SDK
+- `groq` — Groq SDK (OpenAI-compatible chat completions interface)
 - Standard library only for everything else (tkinter, json, datetime, os, threading)

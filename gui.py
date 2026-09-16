@@ -104,10 +104,10 @@ class App:
             messagebox.showwarning("No file", "Please select a JSONL file first.")
             return
 
-        if not os.environ.get("GOOGLE_API_KEY"):
+        if not os.environ.get("GROQ_API_KEY"):
             messagebox.showerror(
                 "API key missing",
-                "GOOGLE_API_KEY environment variable is not set.\n\n"
+                "GROQ_API_KEY environment variable is not set.\n\n"
                 "Set it before running the tool.",
             )
             return
@@ -138,12 +138,7 @@ class App:
         def on_progress(current, total):
             self._root.after(0, self._update_progress, current, total)
 
-        def on_wait(current, total):
-            self._root.after(0, self._show_wait, current, total)
-
-        results = process_reports(
-            reports, progress_callback=on_progress, wait_callback=on_wait
-        )
+        results = process_reports(reports, progress_callback=on_progress)
         self._root.after(0, self._pipeline_done, results)
 
     def _init_progress(self, total):
@@ -154,9 +149,6 @@ class App:
     def _update_progress(self, current, total):
         self._progress_bar["value"] = current
         self._progress_text.set(f"Processing {current}/{total}…")
-
-    def _show_wait(self, current, total):
-        self._progress_text.set(f"Processing {current}/{total}… (waiting for API rate limit)")
 
     def _add_warning_row(self, warning):
         self._tree.insert("", "end", values=("⚠ Parse warning", warning, "—"))
