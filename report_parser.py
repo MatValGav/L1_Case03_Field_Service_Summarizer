@@ -37,6 +37,8 @@ VAGUE_NOTES_PATTERNS = re.compile(
     re.IGNORECASE,
 )
 
+INSUFFICIENT_DATA_WORD_THRESHOLD = 5
+
 
 def parse_timestamp(value):
     return datetime.fromisoformat(value).astimezone(timezone.utc)
@@ -57,6 +59,22 @@ def format_duration(hours):
     if h:
         return f"{h}h"
     return f"{m}min"
+
+
+def _is_insufficient_data_by_length(resolution_text, notes_text):
+    """Word-count based secondary detection for insufficient data.
+
+    Returns True if both resolution and notes are suspiciously brief,
+    regardless of the specific words used. This catches vague reports
+    that regex patterns might miss.
+
+    A report is considered insufficient if:
+    - Resolution has ≤5 words AND
+    - Notes have ≤5 words (including empty)
+    """
+    resolution_words = len(resolution_text.split())
+    notes_words = len(notes_text.split())
+    return resolution_words <= INSUFFICIENT_DATA_WORD_THRESHOLD and notes_words <= INSUFFICIENT_DATA_WORD_THRESHOLD
 
 
 def detect_flags(report, calculated_duration_hours):
@@ -97,7 +115,9 @@ def detect_flags(report, calculated_duration_hours):
 
     resolution_text = resolution.strip()
     notes_text = report.get("technician_notes", "").strip()
-    if VAGUE_RESOLUTION_PATTERNS.match(resolution_text) and VAGUE_NOTES_PATTERNS.match(notes_text):
+    regex_match = VAGUE_RESOLUTION_PATTERNS.match(resolution_text) and VAGUE_NOTES_PATTERNS.match(notes_text)
+    length_match = _is_insufficient_data_by_length(resolution_text, notes_text)
+    if regex_match or length_match:
         flags.append({
             "type": "insufficient_data",
             "detail": "Resolution is a vague placeholder and technician notes are empty or minimal.",
