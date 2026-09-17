@@ -112,20 +112,24 @@ This launches the GUI. The workflow is:
 ## Project structure
 
 ```
-run.bat              One-click launcher (Windows) — sets up venv and runs the tool
 main.py              Entry point — launches the GUI
 gui.py               Tkinter interface (file picker, progress, results, save)
 processor.py         Orchestrates report processing (parse, send, collect)
 llm_client.py        Groq API integration and prompt construction
 report_parser.py     JSONL reader, field validation, contradiction detection
 markdown_writer.py   Assembles the final Markdown output
+run.bat              One-click launcher (Windows) — sets up venv and runs the tool
+run_edge_tests.py    Manual edge-case runner
 requirements.txt     Python dependencies (groq)
 .env.example         API key template
-.gitignore           Excludes .env, __pycache__, venv, output files
 spec.md              Product specification
 plan.md              Architecture and design plan
 tasks.md             Ordered implementation tasks
-decisions.md         Design decisions and plan deviations
+
+data/                JSONL data files (service_reports, test data)
+docs/                Documentation and review artifacts (decisions.md, etc.)
+output/              Generated summaries (gitignored except .gitkeep)
+tests/               Automated test suite (pytest)
 ```
 
 ## Spec-Driven Development process
@@ -144,7 +148,7 @@ sequential commits:
 4. **04-implement** — the tasks were implemented one at a time, each reviewed
    before moving to the next. Deviations discovered during implementation
    (deprecated SDK, retired model, rate limits, provider switch) were
-   documented in `decisions.md` rather than silently changing direction.
+   documented in `docs/decisions.md` rather than silently changing direction.
 
 The spec and plan were committed before any code was written. This ensures
 that design decisions are reviewable, the implementation can be validated

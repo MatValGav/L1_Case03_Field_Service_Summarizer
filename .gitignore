@@ -2,6 +2,7 @@
 __pycache__/
 *.pyc
 *.md.bak
-output/
+output/*.md
+!output/.gitkeep
 *.generated.md
 venv/

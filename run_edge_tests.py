@@ -1,4 +1,5 @@
 """Run the summarizer pipeline against test_edge_cases.jsonl and print results."""
+import os
 import sys
 import time
 from report_parser import parse_jsonl
@@ -7,7 +8,7 @@ from llm_client import LLMClient
 REQUEST_DELAY = 2
 
 def main():
-    filepath = "test_edge_cases.jsonl"
+    filepath = os.path.join("data", "test_edge_cases.jsonl")
     reports, warnings = parse_jsonl(filepath)
 
     for w in warnings:
