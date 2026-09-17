@@ -197,7 +197,7 @@ Examples correctly NOT flagged:
 - `"Replaced faulty relay, chiller operational."` + empty notes — 6 words, enough detail
 - Any report with detailed technician_notes, regardless of short resolution
 
-**Threshold:** `INSUFFICIENT_DATA_WORD_THRESHOLD = 5` (configurable constant at
+**Threshold:** `INSUFFICIENT_DATA_WORD_THRESHOLD = 3` (configurable constant at
 module level).
 
 ---
