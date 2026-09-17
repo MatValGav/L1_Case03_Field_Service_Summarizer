@@ -114,6 +114,33 @@ the only report with actual injection language), 0 false positives.
 
 ---
 
+## Automated test suite
+
+45 pytest tests across four files, all with mocked LLM calls (no real API
+traffic). Each edge-case test is tied to the specific incident or report it
+prevents a regression of:
+
+| Test area | Guards against | Reference reports |
+|---|---|---|
+| Malformed JSON | Pipeline crash on corrupt input | — |
+| Missing fields | Silent data loss from incomplete records | — |
+| Duration mismatch | Undetected timesheet errors | FSR-3005 |
+| Parts mismatch | Contradictions reaching client unflagged | FSR-3006 |
+| Insufficient data | Vague placeholders presented as real summaries | FSR-3007, FSR-3008 |
+| PII in output | Personal data leaking to client portal | FSR-3003, FSR-3014 |
+| Prompt injection | Injected instructions followed or unflagged | FSR-3009 |
+| Benign technical language | False-positive injection flags (aa3905b) | FSR-9008 |
+| technician_id exclusion | Internal identifiers in client output | — |
+| Injection prompt wording | Accidental revert of trigger-phrase list | aa3905b |
+| Markdown status badges | Wrong visual indicator on client portal | — |
+| Output snapshot | Accidental formatting regressions | — |
+| End-to-end pipeline | Integration failures across modules | All |
+
+CI: GitHub Actions workflow (`.github/workflows/tests.yml`) runs `pytest` on
+every push and PR to `master`.
+
+---
+
 ## Validation results (20-report batch)
 
 Validation run against `service_reports.jsonl` (20 real service reports):
