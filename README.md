@@ -132,6 +132,35 @@ output/              Generated summaries (gitignored except .gitkeep)
 tests/               Automated test suite (pytest)
 ```
 
+## Deliverables
+
+| Deliverable | Location |
+|---|---|
+| spec.md, plan.md, tasks.md | Project root (committed as 01-spec, 02-plan, 03-tasks) |
+| Working tool | `run.bat` or `python main.py` |
+| Output for all 20 reports | `docs/service_report_summaries.md` |
+| Analysis of problematic reports | `docs/Service_Reports_Analysis.docx` |
+| AI output review (intent, tests, security, performance, maintainability) | `docs/ai_output_review.md` |
+| Documented decisions on open specification cases | `docs/decisions.md` |
+| Short demo | `docs/demo-recording.mp4` |
+
+## Documentation
+
+The `docs/` folder contains additional files documenting the full development
+process, testing, and decisions made during implementation:
+
+| File | Description |
+|---|---|
+| decisions.md | Documented decisions, plus plan deviations discovered during implementation |
+| ai_output_review.md | Review of AI output across five dimensions (intent, tests, security, performance, maintainability) with three issues found and corrected |
+| service_report_summaries.md | Generated summaries for all 20 service reports |
+| Service_Reports_Analysis.docx | Analysis of reports that could not be summarised normally |
+| EDGE_CASE_TESTING_SUMMARY.md | Results from testing with 10 additional edge case reports |
+| CHANGES_INSUFFICIENT_DATA.md | Details of the insufficient data detection fix |
+| CHANGES_CONFIG_INJECTION.md | Details of the config-block injection detection fix |
+| SYSTEM_PROMPT_COMPARISON.md | Before/after comparison of the LLM system prompt changes |
+| demo-recording.mp4 | Short demo walkthrough of the tool |
+
 ## Spec-Driven Development process
 
 This project was built following a Spec-Driven Development process with four
