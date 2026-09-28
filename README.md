@@ -153,6 +153,7 @@ process, testing, and decisions made during implementation:
 |---|---|
 | decisions.md | Documented decisions, plus plan deviations discovered during implementation |
 | ai_output_review.md | Review of AI output across five dimensions (intent, tests, security, performance, maintainability) with three issues found and corrected |
+| context_engineering.md | Context engineering strategy: system prompt design, iteration history, instruction files, and pre-LLM detection layer |
 | service_report_summaries.md | Generated summaries for all 20 service reports |
 | Service_Reports_Analysis.docx | Analysis of reports that could not be summarised normally |
 | EDGE_CASE_TESTING_SUMMARY.md | Results from testing with 10 additional edge case reports |
